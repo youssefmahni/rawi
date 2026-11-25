@@ -1,0 +1,24 @@
+# secrets and local state
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+
+# environments, caches, logs
+.venv/
+__pycache__/
+.pytest_cache/
+.DS_Store
+app.log
+app.pid
+
+# voice models are large and downloadable; the voice map (IDs only) is kept
+voices/*
+!voices/voices.json
+
+# scratch and generated output
+.superpowers/
+bench/results/
+bench/demo_clips/

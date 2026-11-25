@@ -1,0 +1,6 @@
+{
+  "en":    {"engine": "piper", "model": "en_US-lessac-medium"},
+  "ar-SA": {"engine": "piper", "model": "ar_JO-kareem-medium"},
+  "ar-EG": {"engine": "piper", "model": "ar_JO-kareem-medium"},
+  "ar-MA": {"engine": "piper", "model": "ar_JO-kareem-medium"}
+}

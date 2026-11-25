@@ -1,0 +1,281 @@
+/* CISO Assistant — visionOS-style: a glass window floating in an environment, with an ornament for input.
+   HIG visionOS: glass windows (no separate Dark Mode; white text on glass), ornaments for frequent controls,
+   bolder body text, circular icon buttons, hover highlight. Contrast stays ≥4.5:1 for text (HIG Accessibility). */
+
+:root {
+  color-scheme: dark;
+  --text: #FFFFFF;
+  --text-2: rgba(255, 255, 255, .74);          /* ≥6:1 on the glass */
+  --glass: rgba(30, 30, 40, .52);
+  --glass-thick: rgba(36, 36, 46, .66);
+  --glass-edge: rgba(255, 255, 255, .2);
+  --fill: rgba(255, 255, 255, .12);            /* thin material: interactive and secondary surfaces */
+  --fill-hover: rgba(255, 255, 255, .22);
+  --blue: #0A84FF;
+  --bubble-user: #0A6CD9;                      /* white text 5.05:1 */
+  --red: #FF453A;
+  --green: #30D158;
+  --orange: #FF9F0A;
+  --teal: #40C8E0;
+  --blur: blur(48px) saturate(160%);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Inter", system-ui, sans-serif;
+  --font-ar: "Noto Naskh Arabic", "Geeza Pro", "Segoe UI", system-ui, sans-serif;
+  --level: 0;
+}
+
+/* HIG Accessibility: stronger separation with Increase Contrast */
+@media (prefers-contrast: more) {
+  :root {
+    --text-2: rgba(255, 255, 255, .94);
+    --glass: rgba(12, 12, 18, .9);
+    --glass-thick: rgba(16, 16, 22, .94);
+    --glass-edge: rgba(255, 255, 255, .6);
+    --fill: rgba(255, 255, 255, .2);
+    --fill-hover: rgba(255, 255, 255, .32);
+    --bubble-user: #0050C8;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { background: #141824; }
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px 12px;
+  color: var(--text);
+  font: 500 1.0625rem/1.4 var(--font);       /* visionOS uses a bolder body style */
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+button, input, select { font: inherit; color: inherit; }
+
+:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}
+
+/* ---- environment: the "room" behind the window ---- */
+.environment {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(60% 50% at 18% 22%, rgba(110, 92, 220, .55), transparent 70%),
+    radial-gradient(50% 45% at 85% 30%, rgba(40, 150, 200, .45), transparent 70%),
+    radial-gradient(70% 55% at 60% 95%, rgba(214, 120, 70, .35), transparent 70%),
+    linear-gradient(180deg, #1d2236 0%, #141824 60%, #10131c 100%);
+}
+
+/* ---- the window: glass with depth ---- */
+.window {
+  position: relative;
+  width: min(760px, 100%);
+  height: calc(100dvh - 150px);
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 46px;
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--blur);
+  backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-edge);
+  box-shadow: 0 40px 90px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .22);
+  overflow: hidden;
+}
+
+.bar-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toolbar .bar-inner { padding: 18px 24px 10px; }
+
+h1 {
+  flex: 1;
+  margin: 0;
+  font-size: 1.1875rem;
+  font-weight: 700;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--fill);
+  font-size: .8125rem;
+  color: var(--text-2);
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-2);
+}
+.status[data-health="ok"] .dot { background: var(--green); }
+.status[data-health="down"] .dot { background: var(--red); }
+.status[data-health="nokey"] .dot { background: var(--orange); }
+
+/* ---- messages (scroll inside the window) ---- */
+main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 24px 56px;                    /* bottom room so the ornament never covers the last line */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, .25) transparent;
+}
+
+.bubble {
+  max-width: 72%;
+  padding: 10px 16px;
+  border-radius: 22px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.bubble.user {
+  align-self: flex-end;
+  background: var(--bubble-user);
+  color: #FFF;
+}
+.turn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+.bubble.assistant { background: var(--fill); }
+
+.system-message {
+  align-self: center;
+  max-width: 90%;
+  margin: 4px 0;
+  text-align: center;
+  font-size: .8125rem;
+  color: var(--text-2);
+}
+.system-message.error { color: var(--text); font-weight: 600; }
+
+/* ---- ornament: the input bar floats below the window (HIG Ornaments: frequent controls, ≤ window width) ---- */
+.ornament {
+  position: relative;
+  z-index: 2;
+  width: min(640px, calc(100% - 48px));
+  margin-top: -30px;                          /* overlaps the window's lower edge, like a visionOS ornament */
+  border-radius: 999px;
+  background: var(--glass-thick);
+  -webkit-backdrop-filter: var(--blur);
+  backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-edge);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .22);
+}
+.ornament .bar-inner { padding: 8px 8px 8px 10px; }
+
+.grabber {
+  width: 120px;
+  height: 7px;
+  margin-top: 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .35);
+}
+
+#question {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  padding: 8px 20px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--fill);
+  transition: background-color .15s;
+}
+#question:hover { background: var(--fill-hover); }
+#question::placeholder { color: var(--text-2); }
+
+.mic {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--blue);
+  color: #FFF;
+  cursor: pointer;
+  transition: box-shadow .08s linear, background-color .2s, transform .15s, filter .15s;
+}
+.mic:hover { filter: brightness(1.15); }
+.mic:active { transform: scale(.94); }
+.mic .icon { width: 28px; height: 28px; display: none; }
+.mic[data-state="idle"] .icon-mic,
+.mic[data-state="listening"] .icon-mic,
+.mic[data-state="transcribing"] .icon-spin,
+.mic[data-state="thinking"] .icon-spin,
+.mic[data-state="speaking"] .icon-stop { display: block; }
+
+.mic[data-state="listening"] {
+  background: var(--red);
+  box-shadow: 0 0 0 calc(4px + var(--level) * 14px) color-mix(in srgb, var(--red) 35%, transparent);
+}
+.mic[data-state="transcribing"],
+.mic[data-state="thinking"],
+.mic[data-state="speaking"] { background: var(--fill-hover); }
+.mic[data-state="transcribing"] { cursor: progress; }
+.icon-spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---- dialect badge + right-to-left ---- */
+.dialect-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: .6875rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+  color: var(--text-2);
+  background: var(--fill);
+}
+[dir="rtl"] {
+  font-family: var(--font-ar);
+  text-align: right;
+}
+.turn:has(> [dir="rtl"]) { align-items: flex-end; }
+
+/* ---- small screens: the window fills the width ---- */
+@media (max-width: 600px) {
+  body { padding: 12px 8px 8px; }
+  .window { border-radius: 32px; height: calc(100dvh - 110px); }
+  main { padding: 8px 14px 52px; }
+  .toolbar .bar-inner { padding: 14px 16px 8px; gap: 8px; }
+  h1 { font-size: 1.0625rem; }
+}
+
+/* HIG Accessibility: Reduce Transparency → solid surfaces */
+@media (prefers-reduced-transparency: reduce) {
+  .window, .ornament {
+    background: #23242e;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* HIG Accessibility: Reduce Motion → no spinning, scaling or ring growth */
+@media (prefers-reduced-motion: reduce) {
+  .icon-spin { animation: none; }
+  .mic, #question { transition: none; }
+  .mic:active { transform: none; }
+  .mic[data-state="listening"] {
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--red) calc(15% + var(--level) * 45%), transparent);
+  }
+}

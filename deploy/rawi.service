@@ -1,0 +1,13 @@
+[Unit]
+Description=Rawi voice assistant
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=%h/rawi
+ExecStart=%h/rawi/.venv/bin/python app.py
+Restart=on-failure
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=default.target

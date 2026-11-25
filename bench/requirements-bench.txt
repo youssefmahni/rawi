@@ -1,0 +1,5 @@
+faster-whisper==1.2.1
+av>=11,<17
+datasets[audio]
+soundfile
+arabic-asr-benchmark[hf] @ git+https://github.com/echonova-ai-solutions/arabic-asr-benchmark

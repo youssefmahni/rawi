@@ -1,0 +1,18 @@
+{
+  "en": {
+    "engine": "elevenlabs",
+    "voice_id": "nPczCjzI2devNBz1zQrb"
+  },
+  "ar-SA": {
+    "engine": "elevenlabs",
+    "voice_id": "yXEnnEln9armDCyhkXcA"
+  },
+  "ar-EG": {
+    "engine": "elevenlabs",
+    "voice_id": "IES4nrmZdUBHByLBde0P"
+  },
+  "ar-MA": {
+    "engine": "elevenlabs",
+    "voice_id": "PmGnwGtnBs40iau7JfoF"
+  }
+}
